@@ -20,18 +20,22 @@ else:
 
 app.config['SQLALCHEMY_DATABASE_URI'] = SQLALCHEMY_DATABASE_URI
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-# app.logger.setLevel(DEBUG)
 
 # If a secret key is set, cryptographic components can use this to sign cookies and other things.
 # Set this to a complex random value when you want to use the secure cookie for instance.
 # import os; os.urandom(24)
-app.secret_key = b"\xa4\x97\x05T9\x11B\xd3@\x89\xa3\xa7\x0e\xde(NA\xb17I&X\xde'"
+if os.environ.get('SECRET_KEY') is None:
+    SECRET_KEY = b"\xa4\x97\x05T9\x11B\xd3@\x89\xa3\xa7\x0e\xde(NA\xb17I&X\xde'"
+else:
+    SECRET_KEY = os.environ['SECRET_KEY']
+app.secret_key = SECRET_KEY
+
+
+# app.logger.setLevel(DEBUG)
 
 db.init_app(app)
 
-
 # For bootstrap: Flask-Bootstrap extension on PyPI
-
 
 # Fake login for now
 def logged_in_user():
@@ -70,7 +74,7 @@ def user(username):
 
 @app.errorhandler(404)
 def page_not_found(e):
-    return render_template("404.html"), 400
+    return render_template("404.html"), 404
 
 
 @app.errorhandler(500)
