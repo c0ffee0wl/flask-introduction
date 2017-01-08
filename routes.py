@@ -1,5 +1,4 @@
 import os
-from datetime import datetime
 # from logging import DEBUG
 
 from flask import Flask, render_template, request, redirect, url_for, flash
@@ -8,12 +7,14 @@ from models import db
 from forms import BookmarkForm
 from models import Bookmark
 
+
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 app = Flask(__name__)
 
 if os.environ.get('DATABASE_URL') is None:
-    SQLALCHEMY_DATABASE_URI = 'postgresql://localhost/thermos'  # 'sqlite:///' + os.path.join(basedir, 'db', 'thermos.db')
+    SQLALCHEMY_DATABASE_URI = 'postgresql://localhost/thermos'
+    # SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'db', 'thermos.db')
 else:
     SQLALCHEMY_DATABASE_URI = os.environ['DATABASE_URL']
 
