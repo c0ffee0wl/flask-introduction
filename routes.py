@@ -2,6 +2,7 @@ import os
 # from logging import DEBUG
 
 from flask import Flask, render_template, request, redirect, url_for, flash
+from flask_login import LoginManager, login_required
 
 from models import db
 from forms import BookmarkForm
@@ -30,10 +31,15 @@ else:
     SECRET_KEY = os.environ['SECRET_KEY']
 app.secret_key = SECRET_KEY
 
-
 # app.logger.setLevel(DEBUG)
-
 db.init_app(app)
+
+
+# Configure authentication
+login_manager = LoginManager()
+login_manager.session_protection = "strong"
+login_manager.init_app(app)
+
 
 # For bootstrap: Flask-Bootstrap extension on PyPI
 
@@ -49,6 +55,7 @@ def index():
 
 
 @app.route("/add", methods=["GET", "POST"])
+@login_required
 def add():
 
     form = BookmarkForm()
