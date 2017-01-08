@@ -13,7 +13,7 @@ from datetime import datetime
 
 from sqlalchemy import desc
 
-from app import db
+from routes import db
 
 
 class Bookmark(db.Model):
