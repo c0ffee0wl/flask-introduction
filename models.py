@@ -1,18 +1,9 @@
-
-# Create database initially with
-
-# python3
-# from routes import db
-# from models import User, Bookmark
-# db.create_all()
-# u=User(username="soandso", email="info@example.com")
-# db.session.add(u)
-# db.session.commit()
-
 from datetime import datetime
 
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import desc
+from werkzeug.security import generate_password_hash, check_password_hash
+from flask_login import UserMixin
 
 
 db = SQLAlchemy()
@@ -33,13 +24,27 @@ class Bookmark(db.Model):
         return "<Bookmark '{}': '{}'".format(self.description, self.url)
 
 
-class User(db.Model):
+class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True)
     email = db.Column(db.String(120), unique=True)
-    # First argument gives many side of the relation
-    # backref is the name of an attribute on the related object / that will be set on the many side
-    bookmarks = db.relationship("Bookmark", backref="user", lazy="dynamic")
+    bookmarks = db.relationship('Bookmark', backref='user', lazy='dynamic')
+    password_hash = db.Column(db.String)
+
+    @property
+    def password(self):
+        raise AttributeError('password: write-only field')
+
+    @password.setter
+    def password(self, password):
+        self.password_hash = generate_password_hash(password)
+
+    def check_password(self, password):
+        return check_password_hash(self.password_hash, password)
+
+    @staticmethod
+    def get_by_username(username):
+        return User.query.filter_by(username=username).first()
 
     def __repr__(self):
-        return "<User %r>" % self.username
+        return "<User '{}'>".format(self.username)
