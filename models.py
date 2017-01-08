@@ -11,9 +11,11 @@
 
 from datetime import datetime
 
+from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import desc
 
-from routes import db
+
+db = SQLAlchemy()
 
 
 class Bookmark(db.Model):

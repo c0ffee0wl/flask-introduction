@@ -3,11 +3,10 @@ from datetime import datetime
 # from logging import DEBUG
 
 from flask import Flask, render_template, request, redirect, url_for, flash
-from flask_sqlalchemy import SQLAlchemy
 
+from models import db
 from forms import BookmarkForm
-import models
-
+from models import Bookmark
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
@@ -19,6 +18,7 @@ else:
     SQLALCHEMY_DATABASE_URI = os.environ['DATABASE_URL']
 
 app.config['SQLALCHEMY_DATABASE_URI'] = SQLALCHEMY_DATABASE_URI
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 # app.logger.setLevel(DEBUG)
 
 # If a secret key is set, cryptographic components can use this to sign cookies and other things.
@@ -26,7 +26,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = SQLALCHEMY_DATABASE_URI
 # import os; os.urandom(24)
 app.secret_key = b"\xa4\x97\x05T9\x11B\xd3@\x89\xa3\xa7\x0e\xde(NA\xb17I&X\xde'"
 
-db = SQLAlchemy(app)
+db.init_app(app)
 
 
 # For bootstrap: Flask-Bootstrap extension on PyPI
@@ -34,7 +34,7 @@ db = SQLAlchemy(app)
 @app.route("/")
 @app.route("/index")
 def index():
-    return render_template("index.html", new_bookmarks=models.Bookmark.newest(5))
+    return render_template("index.html", new_bookmarks=Bookmark.newest(5))
 
 
 @app.route("/add", methods=["GET", "POST"])
@@ -45,7 +45,7 @@ def add():
     if form.validate_on_submit():
         url = form.url.data
         description = form.description.data
-        bm = models.Bookmark(url=url, description=description)
+        bm = Bookmark(url=url, description=description)
         db.session.add(bm)
         db.session.commit()
         # app.logger.debug("Stored url: " + url)
